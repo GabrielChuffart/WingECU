@@ -54,7 +54,7 @@ flowchart LR
 
 | Parameter | Value |
 |---|---|
-| Scale factor | 1:50 |
+| Torque scale factor (bench / F1) | ≈ 1/300, provisional — set after M1 motor measurements ([s02](matlab/sizing/s02_scale_factor.m)) |
 | Hinge axis position | 0.55 · c |
 | Flap opening | 40° |
 | Motors | 2 × GM4108H-120T (identical) |
