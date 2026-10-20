@@ -1,0 +1,46 @@
+# --- OS / editors ---
+.DS_Store
+Thumbs.db
+desktop.ini
+.vscode/*
+!.vscode/extensions.json
+.idea/
+
+# --- Firmware builds (STM32CubeIDE / PlatformIO / CMake) ---
+Debug/
+Release/
+build/
+.pio/
+*.o
+*.d
+*.su
+*.map
+*.list
+*.elf
+*.hex
+*.bin
+.settings/
+*.launch
+
+# --- KiCad ---
+*-backups/
+*.kicad_prl
+fp-info-cache
+*.lck
+\#auto_saved_files#
+_autosave-*
+
+# --- MATLAB / Simulink ---
+*.asv
+*.autosave
+*.slxc
+*.mexw64
+slprj/
+codegen/
+*.mat.bak
+
+# --- CAD exports and large raw files (publish in Releases instead) ---
+*.f3d.bak
+results/raw/
+*.mp4
+*.mov

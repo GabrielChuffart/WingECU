@@ -1,0 +1,122 @@
+\documentclass[11pt,a4paper]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage[margin=2.5cm]{geometry}
+\usepackage{amsmath}
+\usepackage{booktabs}
+\usepackage{enumitem}
+\usepackage{url}
+\setlist{nosep,leftmargin=*}
+
+\title{Real-Time Embedded Control of an Active Rear Wing\\under Emulated Aerodynamic Load}
+\author{Gabriel Chuffart, \textit{276671}, \textit{gabriel.chuffart@studenti.unitn.it}}
+\date{October 20, 2026}
+
+\begin{document}
+\maketitle
+
+\section{Introduction}
+Active aerodynamic systems trade downforce for drag in real time. Since 2011, Formula~1 cars have used the Drag Reduction System (DRS): an actuator opens the upper flap of the rear wing on the straights to reduce drag, and the flap closes automatically as soon as the driver brakes, when downforce is needed again~\cite{therace_drs}. Adjustable rear wings and front devices are also studied on road and track cars to shape the front/rear downforce balance~\cite{decupis2021}, and lap-time simulations show that adaptive aerodynamics brings a measurable gain over a static set-up~\cite{rijns2025}.
+
+From an embedded-systems point of view, this system is a hard real-time actuator. There are three main problems suitable for a low-cost implementation. First, the flap must hold its position against an aerodynamic hinge moment that grows with the square of the speed~\cite{katz1995}. Second, the braking event must be detected and the flap closed within a given latency. Third, any fault (power loss, sensor failure, software hang) must bring the flap back to the high-downforce position, taking inspiration from the fail-safe principles of ISO~26262~\cite{iso26262}.
+
+Testing this kind of system on a real car is neither safe nor repeatable. Actuators are therefore validated on load simulators that reproduce the aerodynamic hinge moment on the actuator shaft~\cite{dellamico2024}. This project applies the same approach at a smaller scale: a 3D-printed flap is driven by a direct-drive brushless motor, while a second motor emulates the aerodynamic load computed from real driving data. The goal is to compare three control architectures and to characterise the real-time behaviour, the fail-safe behaviour and the power consumption of the system.
+
+\section{Project Description}
+The goal is an embedded active-wing controller (the ``Wing ECU'') that (i)~estimates the vehicle state on board, (ii)~decides when to open or close the flap, (iii)~tracks the flap angle under aerodynamic load, and (iv)~reaches the safe position on any fault.
+
+The aerodynamic hinge moment is modelled as
+\begin{equation}
+  M_h = \tfrac{1}{2}\,\rho\, v^2\, S\, c\, C_h(\delta),
+\end{equation}
+where $v$ is the vehicle speed, $S$ and $c$ are the flap area and mean chord, and $C_h(\delta)$ is the hinge-moment coefficient as a function of the flap angle~$\delta$, taken from the literature. A scaled version of $M_h$ is applied in real time by the load-emulator motor. The bench is a simplified, small-scale model inspired by the F1 DRS: the aim is to study the embedded control problem with student-level hardware, not to reach F1-level performance. The initial sizing is summarised in Table~\ref{tab:sizing}.
+
+\begin{table}[h]
+\centering
+\begin{tabular}{ll}
+\toprule
+Parameter & Initial value \\
+\midrule
+Scale factor (bench / F1) & 1/50 \\
+Hinge axis position & $0.55\,c$ from the leading edge \\
+Maximum flap opening & $40^\circ$ \\
+Actuator and emulator motors & 2 identical GM4108H-120T gimbal motors \\
+Return spring & low-stiffness torsion spring, preloaded towards closed \\
+\bottomrule
+\end{tabular}
+\caption{Initial bench sizing (to be refined in M1).}
+\label{tab:sizing}
+\end{table}
+
+The core of the project is a comparison of three position-control architectures under identical replayed driving profiles:
+\begin{description}[leftmargin=2.5em,labelwidth=2em]
+  \item[C1] PID position control;
+  \item[C2] PID with feed-forward compensation of the modelled hinge moment;
+  \item[C3] PID with a disturbance observer that estimates the load torque online~\cite{sariyildiz2020}.
+\end{description}
+
+\paragraph{Validation measurements.} The initial targets below will be refined after milestone M1. Every measurement is repeated for C1--C3 under the same driving profiles.
+
+\textit{Control performance}
+\begin{itemize}
+  \item Flap tracking error (RMS and peak) and closing time (10--90\,\%) at several emulated speeds. Target: closing time below 100\,ms at the highest emulated load.
+\end{itemize}
+
+\textit{Delays and timing}
+\begin{itemize}
+  \item End-to-end braking delay, split into stages: start of braking $\rightarrow$ detection on the IMU $\rightarrow$ close decision $\rightarrow$ close command $\rightarrow$ flap at 90\,\% closed. Each stage is time-stamped by a GPIO toggle and read on the oscilloscope; the flap position comes from the encoder.
+  \item CAN latency between the two boards (message sent $\rightarrow$ received and processed).
+  \item Latency, jitter and maximum measured execution time of each RTOS task under load, measured with GPIO toggling, the DWT cycle counter and SEGGER SystemView.
+  \item Fault reaction time for injected faults (power cut, encoder disconnected, frozen task, lost CAN messages). Target: flap in the safe position within 200\,ms.
+\end{itemize}
+
+\textit{Power and energy}
+\begin{itemize}
+  \item Electrical power of each board, measured by a low-cost current/voltage monitor on the 12\,V input and logged with the other signals. The bench power supply is used as a cross-check.
+  \item Energy per open/close cycle, holding power with the flap open, and energy over a full lap profile, for C1--C3.
+  \item Influence of the return-spring stiffness: a stiffer spring closes faster on a fault but costs more holding current when the flap is open.
+\end{itemize}
+
+\subsection{Hardware}
+Two identical custom PCBs are designed in KiCad: one is the Wing ECU, the other drives the load emulator. They communicate over CAN. Most of the components (STM32 microcontrollers and development boards) are provided by the lab; firmware development starts on lab development boards while the custom PCBs are manufactured.
+\begin{itemize}
+  \item \textbf{MCU:} STM32G474 (Cortex-M4F, 170\,MHz, FD-CAN, advanced motor-control timers), available in the lab. A similar MCU could replace it; this one was chosen for its motor-control peripherals.
+  \item \textbf{Motor drivers:} one integrated three-phase driver with current sensing per board.
+  \item \textbf{Flap actuator:} direct-drive brushless gimbal motor. Direct drive avoids gearbox backlash, and the phase current gives an estimate of the torque.
+  \item \textbf{Load emulator:} a second, identical motor coupled to the flap shaft.
+  \item \textbf{Position sensing:} 14-bit magnetic encoders on both shafts.
+  \item \textbf{Vehicle state:} 6-axis IMU and GNSS module on the Wing ECU, so that the board needs no connection to the car (the OBD port is slow, and most useful data are proprietary to each manufacturer).
+  \item \textbf{Power measurement:} low-cost current/voltage monitor (INA226 type) on the 12\,V input of each board.
+  \item \textbf{Mechanics:} 3D-printed flap, shaft supports and coupling, ball bearings, torsion return spring.
+  \item \textbf{Supply:} 12\,V bench supply, local 5\,V and 3.3\,V regulators.
+\end{itemize}
+Measurements use the on-board sensors (encoders, phase currents, IMU, power monitors), GPIO toggling with an oscilloscope for timing, and the bench power supply as an energy reference.
+
+\subsection{Software}
+\begin{itemize}
+  \item \textbf{OS:} FreeRTOS~\cite{freertos} on the STM32G474.
+  \item \textbf{Language and drivers:} C with the STM32Cube LL/HAL drivers and CMSIS-DSP.
+  \item \textbf{Motor control:} field-oriented current control written on the LL drivers, with the ST Motor Control SDK as a fallback.
+  \item \textbf{Task planning:} current loop in the PWM interrupt; flap position loop; vehicle-state estimation and braking detection; open/close logic and safety monitor; power monitoring and data logging. On the emulator board: the hinge-moment model and the torque loop.
+  \item \textbf{Instrumentation:} GPIO time-stamps at each stage of the braking chain, DWT cycle counter for execution times, synchronised logging of position, current and power.
+  \item \textbf{Safety:} hardware watchdog, independent supervision task, spring-driven return to the safe position on any loss of control.
+  \item \textbf{Off-line tools:} MATLAB for the aerodynamic model, the synthetic lap profiles and the analysis of the measurements (aerodynamic and lap-profile optimisation are outside the scope of this embedded-systems project); SEGGER SystemView for RTOS tracing.
+\end{itemize}
+
+\subsection{Milestones and Time Estimation (subject to change)}
+\begin{itemize}
+  \item \textbf{M1} (around 35\,h): PCBs assembled; field-oriented control and flap position loop running without load; IMU/GNSS and power monitors acquired; timing instrumentation in place.
+  \item \textbf{M2} (around 45\,h): two-motor bench with load emulation; C1--C3 implemented and compared on synthetic lap profiles, including tracking, timing and energy.
+  \item \textbf{M3} (around 50\,h): real driving data replayed on the bench; braking detection and end-to-end delay budget; fault-injection process; power and energy campaign; final measurements and report.
+\end{itemize}
+
+\subsection{Stretch goals}
+\begin{itemize}
+  \item \textbf{S1:} earlier braking detection from the brake-light signal, read through an optocoupler without cutting any wire, and comparison of the resulting delay with IMU-based detection.
+  \item \textbf{S2:} reduce the energy needed to hold the flap open by 30\,\%, by tuning the return spring and adding a low-current holding mode.
+  \item \textbf{S3:} speed-scheduled controller gains with automatic tuning on the bench.
+\end{itemize}
+
+\bibliographystyle{unsrt}
+\bibliography{references}
+\end{document}

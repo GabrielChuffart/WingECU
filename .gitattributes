@@ -1,0 +1,16 @@
+* text=auto
+*.c text eol=lf
+*.h text eol=lf
+*.m text eol=lf
+*.md text eol=lf
+*.kicad_sch text eol=lf
+*.kicad_pcb text eol=lf
+*.kicad_pro text eol=lf
+*.stl binary
+*.step binary
+*.f3d binary
+*.slx binary
+*.mat binary
+*.png binary
+*.jpg binary
+*.pdf binary
