@@ -79,6 +79,10 @@ Detailed tasks are tracked in [`docs/roadmap.md`](docs/roadmap.md).
 | M2 | Two-motor bench with load emulation, C1 to C3 compared on synthetic laps | Planned |
 | M3 | Real driving data, braking detection, fault injection, measurement campaign, report | Planned |
 
+## License
+
+Hardware design files are released under the CERN Open Hardware Licence Version 2, Permissive (CERN-OHL-P-2.0), software under the MIT License, and documentation under CC-BY-4.0. See [LICENSE.md](LICENSE.md) for the folder-by-folder details.
+
 ## Author
 
 Gabriel Chuffart, MSc Intelligent Mechatronics Engineering, University of Trento

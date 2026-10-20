@@ -27,10 +27,25 @@ p.aero.x_cp      = 0.30;    % [-] centre of pressure, fraction of chord from the
 %% Bench design (C) - geometry validated 2026-10-19
 p.bench.x_hinge   = 0.55;          % [-]   hinge axis, fraction of chord from the leading edge
 p.bench.delta_max = deg2rad(40);   % [rad] full opening angle
+p.bench.k_scale   = 1/300;         % [-]   bench torque / F1 hinge moment, provisional (s02 window)
 p.bench.V_bus     = 12;            % [V]   bench supply (proposal)
 p.bench.T_par     = 0.01;          % [N m] parasitic torque, cogging + bearings, both motors (A) -> measure in M1
 p.bench.eta_aero  = 0.5;           % [-]   share of actuator torque for the emulated aero load
 p.bench.snr_min   = 3;             % [-]   min ratio emulated load / parasitic torque
+
+p.bench.t_close   = 0.100;         % [s]   closing time target, 10-90 % (proposal)
+p.bench.t_fs      = 0.200;         % [s]   fault reaction target, flap back to closed (proposal)
+
+%% Bench flap and rotating parts (A) -> to be set in CAD
+p.bench.flap_c    = 0.10;          % [m]   printed flap chord
+p.bench.flap_m    = 0.040;         % [kg]  printed flap mass (PLA shell, 150 mm span)
+p.mech.m_rotor    = 0.045;         % [kg]  rotor bell + magnets, one motor
+p.mech.r_rotor    = 0.021;         % [m]   mean magnet radius (motor OD 47 mm)
+p.mech.J_margin   = 1.2;           % [-]   shaft, coupling, screws
+
+%% Return spring (C) - sizing criteria, values computed in s03
+p.spring.n_hold   = 2;             % [-]   preload >= n_hold * T_par (holds closed, no aero, no actuator)
+p.spring.ratio    = 1.5;           % [-]   torque at delta_max / preload (low stiffness)
 
 %% Motor iFlight GM4108H-120T (D)
 p.motor.R_ll    = 11.1;                 % [ohm] line-to-line resistance
