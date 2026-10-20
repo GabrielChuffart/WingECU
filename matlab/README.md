@@ -1,4 +1,4 @@
-# MATLAB — sizing and models
+# MATLAB sizing and models
 
 | Folder | Contents |
 |---|---|
