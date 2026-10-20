@@ -1,6 +1,6 @@
 # Roadmap
 
-Milestones follow the [project proposal](proposal/ProjectProposal_GabrielChuffart_v2.pdf). Each item can be opened as a GitHub issue and tracked on the project board.
+Milestones following the [project proposal](proposal/ProjectProposal_GabrielChuffart_v2.pdf)
 
 ## M1 — Hardware and bring-up (~35 h)
 - [x] Initial bench sizing (2 × GM4108H-120T, hinge at 0.55·c, 40° opening, scale 1/50, preloaded spring)
