@@ -24,17 +24,32 @@ Measured outputs:
 
 ## System overview
 
-```
-            CAN bus
- ┌──────────────────┐        ┌──────────────────────┐
- │   Wing ECU       │◄──────►│   Load emulator      │
- │ STM32G474        │        │ STM32G474            │
- │ FreeRTOS         │        │ FreeRTOS             │
- │ IMU + GNSS       │        │ speed profile → τ(v²)│
- └────────┬─────────┘        └──────────┬───────────┘
-          │ FOC                          │ FOC
-     GM4108H-120T ════ flap hinge ════ GM4108H-120T
-      (actuator)        (shared axis)     (aero load)
+```mermaid
+flowchart LR
+    subgraph ECU["Wing ECU · STM32G474 · FreeRTOS"]
+        direction TB
+        IMU["IMU + GNSS<br/>or replayed drive data"] --> EST["Vehicle state<br/>straight-line & braking detection"]
+        EST --> LOGIC["Open/close logic<br/>+ safety monitor"]
+        LOGIC --> POS["Flap position loop<br/>C1 / C2 / C3"]
+        POS --> FOC1["FOC current loop"]
+    end
+
+    subgraph MECH["Bench mechanics"]
+        direction TB
+        SPRING["Return spring<br/>fail-safe: closed"] === SHAFT(("Flap<br/>hinge shaft"))
+        M1["GM4108H-120T<br/>actuator + encoder"] === SHAFT
+        SHAFT === M2["GM4108H-120T<br/>load + encoder"]
+    end
+
+    subgraph EMU["Load emulator · STM32G474 · FreeRTOS"]
+        direction TB
+        PROF["Driving profile<br/>speed v"] --> AERO["Hinge-moment model<br/>M_h ∝ v² · C_h(δ)"]
+        AERO --> FOC2["FOC torque loop"]
+    end
+
+    ECU <-->|"phases · angle δ"| MECH
+    MECH <-->|"phases · angle δ"| EMU
+    ECU <-->|CAN| EMU
 ```
 
 | Parameter | Value |
