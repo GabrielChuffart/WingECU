@@ -67,7 +67,7 @@ The Wing ECU decides on its own when to open the flap (straight line detected) a
 | `matlab/` | Sizing scripts and control models |
 | `test-bench/` | Test procedures and data-logging scripts |
 | `results/` | Measured data and plots |
-| `docs/` | [Project proposal](docs/proposal/), design notes, roadmap, images |
+| `docs/` | [Project proposal](docs/proposal/), [bill of materials](docs/bom.xlsx), roadmap, images |
 
 ## Roadmap
 
