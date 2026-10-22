@@ -1,0 +1,24 @@
+Section,Item,Reference,Qty,Unit price EUR,Total EUR,Source,Price basis,Notes
+Actuation,Gimbal motor with 14-bit encoder,iFlight GM4108H-120T + AS5048A,2,51.00,102.00,Buy,"iFlight shop, USD 54.99, 2026-10-22","Actuator and load emulator. Cheaper option: motor without encoder (USD 35.90) + MT6701 board and diametric magnet"
+Bring-up,STM32G474 development board,NUCLEO-G474RE,2,0.00,0.00,Lab,Provided by the lab,Firmware bring-up before the custom PCB; on-board ST-LINK
+Bring-up,Three-phase driver board with current sensing,To confirm with the lab,2,0.00,0.00,Lab,Provided by the lab,"FOC bring-up on the Nucleo; must accept 24 V; validates the driver choice for the PCB"
+Bring-up,CAN transceiver module,TJA1051 or SN65HVD230 breakout,2,2.50,5.00,Lab or buy,Estimate,Two-node CAN link on the Nucleo boards
+Bring-up,Power monitor breakout,INA226 module,2,3.00,6.00,Buy,Estimate,Validates power and energy logging before the PCB (bus up to 36 V)
+Sensing,6-axis IMU module,To confirm with the lab,1,0.00,0.00,Lab,Provided by the lab,Wing ECU only; on a header of the custom board
+Sensing,GNSS module,To confirm with the lab,1,0.00,0.00,Lab,Provided by the lab,Wing ECU only; on a header of the custom board
+Custom PCB,Microcontroller,STM32G474RET6,2,0.00,0.00,Lab,Provided by the lab,One per board
+Custom PCB,Three-phase driver with current sensing,DRV8316 or equivalent,2,4.00,8.00,Buy,Estimate,"Up to 35 V; must support high-impedance outputs on fault (s04 fail-safe result)"
+Custom PCB,CAN transceiver,TCAN1042 or TJA1051,2,1.00,2.00,Buy,Estimate,One per board
+Custom PCB,Power monitor and shunt,INA226 + 10 mOhm shunt,2,3.00,6.00,Buy,Estimate,On the 24 V input of each board
+Custom PCB,Regulators,24 V to 5 V buck + 3.3 V LDO,2,3.00,6.00,Buy,Estimate,"One set per board; buck rated for at least 30 V input"
+Custom PCB,"Passives, connectors, headers",Locking connectors (JST or Micro-Fit),2,8.00,16.00,Buy,Estimate,One set per board
+Custom PCB,PCB fabrication,"2-layer, 5 pcs",1,15.00,15.00,Buy,"Estimate, shipping included",Same board for the Wing ECU and the load emulator
+Mechanics,Steel shaft,8 mm ground rod,1,5.00,5.00,Buy,Estimate,Matches the 8 mm motor bore
+Mechanics,Ball bearings,608ZZ (8 x 22 x 7 mm),2,1.50,3.00,Buy,Estimate,Shaft supports
+Mechanics,Torsion spring assortment,Several stiffnesses,1,8.00,8.00,Buy,Estimate,Target preload 0.02 N m and 0.0143 N m/rad (s03)
+Mechanics,End-stop pads,Elastomer bumpers,1,3.00,3.00,Buy,Estimate,Absorbs impacts up to about 70 rad/s (s04)
+Mechanics,"Flap, supports, coupling",PLA,1,0.00,0.00,Owned,3D printed,Prusa
+Mechanics,Fasteners,M3 and M4 screws and nuts,1,0.00,0.00,Owned,,
+Instrumentation,Bench power supply,24 V,1,0.00,0.00,Lab,Provided by the lab,Also the energy reference for the INA226
+Instrumentation,Oscilloscope,,1,0.00,0.00,Owned,,Timing measurements with GPIO toggling
+TOTAL,To buy,,,,185.00,,,"About 160 EUR with the cheaper motor option"

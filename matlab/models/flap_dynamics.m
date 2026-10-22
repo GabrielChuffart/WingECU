@@ -17,9 +17,9 @@ w = x(2);                                          % [rad/s] flap speed
 
 switch mode
     case 'open'
-        T_act =  m.T_stall * max(1 - w/m.omega0, 0);   % [N m] motoring, w > 0
+        T_act =  m.T_avail(w);                        % [N m] current or back-EMF limited
     case 'close'
-        T_act = -m.T_stall * max(1 + w/m.omega0, 0);   % [N m] motoring, w < 0
+        T_act = -m.T_avail(w);                        % [N m] current or back-EMF limited
     case 'off'
         T_act = 0;                                     % [N m] high impedance
     case 'short'

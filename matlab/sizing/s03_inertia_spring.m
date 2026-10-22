@@ -33,15 +33,15 @@ fprintf('Rotor share: %.0f %%\n\n', 100*2*J_rotor/J_sum);
 
 %% 2. Motor torque-speed line at V_bus
 w     = linspace(0, m.omega0, 100);                % [rad/s] speed grid
-T_av  = m.T_stall * (1 - w/m.omega0);              % [N m]   available torque, motoring
+T_av  = m.T_avail(w);                              % [N m]   available torque, motoring
 w_avg = dmax / p.bench.t_close;                    % [rad/s] mean speed, full stroke in t_close
 w_pk  = 2 * w_avg;                                 % [rad/s] peak speed, triangular profile
-T_pk  = m.T_stall * (1 - w_pk/m.omega0);           % [N m]   available torque at w_pk
+T_pk  = m.T_avail(w_pk);                           % [N m]   available torque at w_pk
 T_ld  = k * hinge_moment(p.f1.v_max, 0, p);        % [N m]   emulated load, closed, v_max
 
 fprintf('--- 2. Torque-speed line (V_bus = %d V) ---\n', p.bench.V_bus);
-fprintf('T_stall = %.3f N m, omega0 = %.1f rad/s (%.0f rpm)\n', ...
-        m.T_stall, m.omega0, m.omega0*60/(2*pi));
+fprintf('T_stall = %.3f N m (I_max = %.2f A), omega0 = %.1f rad/s (%.0f rpm)\n', ...
+        m.T_stall, m.I_max, m.omega0, m.omega0*60/(2*pi));
 fprintf('Full stroke in %.0f ms: mean %.1f rad/s, peak %.1f rad/s -> T_avail = %.3f N m (-%.0f %%)\n\n', ...
         p.bench.t_close*1e3, w_avg, w_pk, T_pk, 100*(1 - T_pk/m.T_stall));
 
@@ -70,7 +70,7 @@ T_res   = T_ld + T_spr(0) + p.bench.T_par;         % [N m]     resisting torque 
 T_acc   = m.T_stall - T_res;                       % [N m]     left for acceleration at w = 0
 alpha   = T_acc / J;                               % [rad/s^2] initial angular acceleration
 w_reach = sqrt(2*alpha*dmax);                      % [rad/s]   end speed if torque stayed constant
-w_eq    = m.omega0 * (1 - T_res/m.T_stall);        % [rad/s]   speed where T_avail = T_res
+w_eq    = m.omega0 * (1 - T_res/m.T_volt);         % [rad/s]   T_avail = T_res on the voltage line (T_res < T_stall)
 t_open  = dmax / w_eq;                             % [s]       lower bound, stroke at w_eq
 
 figure('Name', 'Motor torque-speed line');

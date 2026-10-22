@@ -72,7 +72,7 @@ The core of the project is a comparison of three position-control architectures 
 
 \textit{Power and energy}
 \begin{itemize}
-  \item Electrical power of each board, measured by a low-cost current/voltage monitor on the 12\,V input and logged with the other signals. The bench power supply is used as a cross-check.
+  \item Electrical power of each board, measured by a low-cost current/voltage monitor on the 24\,V input and logged with the other signals. The bench power supply is used as a cross-check.
   \item Energy per open/close cycle, holding power with the flap open, and energy over a full lap profile, for C1--C3.
   \item Influence of the return-spring stiffness: a stiffer spring closes faster on a fault but costs more holding current when the flap is open.
 \end{itemize}
@@ -86,9 +86,9 @@ Two identical custom PCBs are designed in KiCad: one is the Wing ECU, the other 
   \item \textbf{Load emulator:} a second, identical motor coupled to the flap shaft.
   \item \textbf{Position sensing:} 14-bit magnetic encoders on both shafts.
   \item \textbf{Vehicle state:} 6-axis IMU and GNSS module on the Wing ECU, so that the board needs no connection to the car (the OBD port is slow, and most useful data are proprietary to each manufacturer).
-  \item \textbf{Power measurement:} low-cost current/voltage monitor (INA226 type) on the 12\,V input of each board.
+  \item \textbf{Power measurement:} low-cost current/voltage monitor (INA226 type) on the 24\,V input of each board.
   \item \textbf{Mechanics:} 3D-printed flap, shaft supports and coupling, ball bearings, torsion return spring.
-  \item \textbf{Supply:} 12\,V bench supply, local 5\,V and 3.3\,V regulators.
+  \item \textbf{Supply:} 24\,V bench supply (motor current limited to its 1.5\,A rating in firmware), local 5\,V and 3.3\,V regulators.
 \end{itemize}
 Measurements use the on-board sensors (encoders, phase currents, IMU, power monitors), GPIO toggling with an oscilloscope for timing, and the bench power supply as an energy reference.
 

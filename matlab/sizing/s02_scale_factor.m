@@ -33,16 +33,16 @@ I_max    = min(I_volt, p.motor.I_rated);         % [A]   usable peak current
 T_ds  = mean(p.motor.T_load);                    % [N m] conservative case: datasheet mid value
 T_est = Kt_est * I_max;                          % [N m] optimistic case: Kt estimate * I_max
 
-% Same estimate at 24 V: I_volt doubles, I_rated becomes the limit
-I_max_24 = min(2*I_volt, p.motor.I_rated);       % [A]
-T_est_24 = Kt_est * I_max_24;                    % [N m]
+% Same estimate at 12 V (proposal v2 supply), for reference
+I_max_12 = min(I_volt * 12/p.bench.V_bus, p.motor.I_rated);   % [A] I_volt scales with V_bus
+T_est_12 = Kt_est * I_max_12;                                 % [N m]
 
 fprintf('--- 1. Actuator torque (V_bus = %d V) ---\n', p.bench.V_bus);
 fprintf('KV = %.0f rpm/V -> Kt_est = %.3f N m/A | Kt from datasheet = %.3f N m/A (x%.1f)\n', ...
         KV, Kt_est, Kt_ds, Kt_est/Kt_ds);
 fprintf('I_volt = %.2f A, I_rated = %.2f A -> I_max = %.2f A\n', I_volt, p.motor.I_rated, I_max);
-fprintf('T_act: datasheet %.3f N m | Kt estimate %.3f N m | Kt estimate at 24 V %.3f N m\n\n', ...
-        T_ds, T_est, T_est_24);
+fprintf('T_act: datasheet %.3f N m | Kt estimate %.3f N m | Kt estimate at 12 V %.3f N m\n\n', ...
+        T_ds, T_est, T_est_12);
 
 %% 2. Upper bound k_max: actuator torque budget
 % Peak emulated load = eta_aero * T_act.
