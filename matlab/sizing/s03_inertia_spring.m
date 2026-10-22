@@ -1,4 +1,4 @@
-%% s03_inertia_spring.m: Inertia, return spring, torque budget
+%% s03_inertia_spring.m - Inertia, return spring, torque budget
 % WingECU sizing, step 3.
 % Input : provisional k_scale (s02), motor model, bench flap geometry.
 % Output: rotating inertia, return spring (preload, stiffness),
@@ -9,7 +9,7 @@
 clear; close all; clc;
 here = fileparts(mfilename('fullpath'));   % script folder
 if isempty(here), here = pwd; end          % fallback: section run from the editor
-addpath(fullfile(here, '..', 'models'));   % wingecu_params, hinge_moment, motor_model
+addpath(fullfile(here, '..', 'models'));   % wingecu_params, hinge_moment, motor_model, bench_model
 
 p    = wingecu_params();
 m    = motor_model(p);
@@ -17,13 +17,14 @@ dmax = p.bench.delta_max;                  % [rad] full stroke
 k    = p.bench.k_scale;                    % [-]   provisional (s02)
 
 %% 1. Rotating inertia about the hinge axis
-% Rotor: thin ring at mean magnet radius. Flap: thin plate, CG at mid-chord.
-c_b     = p.bench.flap_c;                                  % [m] bench flap chord
-d_cg    = (p.bench.x_hinge - 0.5) * c_b;                   % [m] hinge to flap CG
-J_rotor = p.mech.m_rotor * p.mech.r_rotor^2;               % [kg m^2] one rotor
-J_flap  = p.bench.flap_m * (c_b^2/12 + d_cg^2);            % [kg m^2] plate about CG + parallel axis
-J_sum   = 2*J_rotor + J_flap;                              % [kg m^2] two rotors on the same shaft
-J       = p.mech.J_margin * J_sum;                         % [kg m^2] + shaft, coupling, screws
+% Rotor: thin ring at mean magnet radius,  J = m*r^2.
+% Flap:  thin plate, CG at mid-chord,      J = m*(c^2/12 + d^2), d = hinge to CG.
+% Two rotors on the same shaft, margin for shaft, coupling, screws.
+b       = bench_model(p);                          % formulas in bench_model.m
+J_rotor = b.J_rotor;                               % [kg m^2] one rotor
+J_flap  = b.J_flap;                                % [kg m^2] printed flap
+J_sum   = 2*J_rotor + J_flap;                      % [kg m^2] without margin
+J       = b.J;                                     % [kg m^2] with margin
 
 fprintf('--- 1. Inertia ---\n');
 fprintf('Rotors 2 x %.2e | flap %.2e | total with margin J = %.2e kg m^2\n', ...
@@ -48,9 +49,9 @@ fprintf('Full stroke in %.0f ms: mean %.1f rad/s, peak %.1f rad/s -> T_avail = %
 % Criteria (no aero, actuator off):
 %   holds closed:    T_pre >= n_hold * T_par
 %   low stiffness:   T(delta_max) = ratio * T_pre
-T_pre = p.spring.n_hold * p.bench.T_par;           % [N m]     preload at delta = 0
-T_end = p.spring.ratio  * T_pre;                   % [N m]     torque at delta_max
-k_s   = (T_end - T_pre) / dmax;                    % [N m/rad] stiffness
+T_pre = b.T_pre;                                   % [N m]     preload at delta = 0
+T_end = b.T_end;                                   % [N m]     torque at delta_max
+k_s   = b.k_s;                                     % [N m/rad] (T_end - T_pre) / delta_max
 T_spr = @(d) T_pre + k_s*d;                        % [N m]     spring torque vs angle, towards closed
 
 % Fail-safe closing at v = 0, actuator off: spring against friction only.

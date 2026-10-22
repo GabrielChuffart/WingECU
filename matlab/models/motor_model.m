@@ -6,6 +6,7 @@ function m = motor_model(p)
 %     I_max   [A]       usable current at stall
 %     T_stall [N m]     torque at zero speed
 %     omega0  [rad/s]   no-load speed at V_bus
+%     c_short [N m s/rad] braking coefficient, phases shorted
 %
 %   Kt from the datasheet no-load speed, ideal motor: Kt = Ke = 1/KV (SI).
 %   Optimistic case of s02, to be replaced by the measured Kt (M1).
@@ -20,4 +21,5 @@ I_volt    = (p.bench.V_bus / sqrt(3)) / R_ph;      % [A]   stall current, SVPWM
 m.I_max   = min(I_volt, p.motor.I_rated);          % [A]
 m.T_stall = m.Kt * m.I_max;                        % [N m]
 m.omega0  = p.bench.V_bus / m.Ke;                  % [rad/s] back-EMF = V_bus
+m.c_short = m.T_stall / m.omega0;                  % [N m s/rad] slope of the torque-speed line = shorted-phase damping
 end

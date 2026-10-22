@@ -8,7 +8,7 @@ Milestones following the [project proposal](proposal/ProjectProposal_GabrielChuf
 - [x] Torque scale factor window (`s02_scale_factor.m`): k ≈ 1/300 provisional, 1/50 rejected
 - [ ] Measure motor Kt/Ke and parasitic torque (fixes the scale factor)
 - [x] Inertia, return spring and torque budget, hand calculation (`s03`)
-- [ ] Opening, closing and fail-safe dynamics, time-domain simulation (`s04`)
+- [x] Opening, closing and fail-safe dynamics, time-domain simulation (`s04`)
 - [ ] Flap, hinge, shaft supports and coupling in CAD, first print
 - [ ] Board schematic and PCB in KiCad (MCU, motor driver, encoder, IMU, GNSS, CAN, INA226 power monitor)
 - [ ] Firmware start on lab development boards while PCBs are made

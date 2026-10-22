@@ -47,6 +47,10 @@ p.mech.J_margin   = 1.2;           % [-]   shaft, coupling, screws
 p.spring.n_hold   = 2;             % [-]   preload >= n_hold * T_par (holds closed, no aero, no actuator)
 p.spring.ratio    = 1.5;           % [-]   torque at delta_max / preload (low stiffness)
 
+%% Simulation (s04)
+p.sim.t_end       = 1.0;           % [s]     max simulated time per stroke
+p.sim.w_eps       = 0.01;          % [rad/s] Coulomb friction smoothing width (numerical)
+
 %% Motor iFlight GM4108H-120T (D)
 p.motor.R_ll    = 11.1;                 % [ohm] line-to-line resistance
 p.motor.n0_rpm  = 540;                  % [rpm] no-load speed at V_test, mid of 513-567
